@@ -8,42 +8,43 @@ Then when you're ready ( and jquery is ) just mark the object you want to start 
 Registrar.js
 ============
     window.registrar = {
-    config: {
-        DEBUG: true,
-        
-    },
-    log: function(message, level){
-        if (registrar.config.DEBUG)
-            console[level](message);
-    },
-    app: {},
-    register: function (on, callback) {
-        registrar.log("registered: " + on, "log");
-        registrar.app[on] = callback;
-        return {
-            OnReady: function (ons) {
-                $(function () {
-                    for (var i = 0; i < ons.length; i++) {
-                        registrar.log("acutlaly running: " + ons[i], "log");
-                        registrar.app[ons[i]]();
-                        if (ons[i + 1])
-                            $(document).trigger(ons[i + 1]);
-                    }
-                });
-            }
-        }
-    }
+	    config: {
+	        DEBUG: true,
+	        
+	    },
+	    log: function(message, level){
+	        if (registrar.config.DEBUG)
+	            console[level](message);
+	    },
+	    app: {},
+	    register: function (on, callback) {
+	        registrar.log("registered: " + on, "log");
+	        registrar.app[on] = callback;
+	        return {
+	            OnReady: function (ons) {
+	                $(function () {
+	                    for (var i = 0; i < ons.length; i++) {
+	                        registrar.log("acutlaly running: " + ons[i], "log");
+	                        registrar.app[ons[i]]();
+	                        if (ons[i + 1])
+	                            $(document).trigger(ons[i + 1]);
+	                    }
+	                });
+	            }
+	        }
+	    }
     };
     window.r = window.registrar.register;
 
 init.js
 ============
-     r("init.app", function () {
+	r("init.app", function () {
         //set up object for the rest of the app to use; 
-        exports.app = {
-            services: {}
-        };
-    })(window.jQuery, window.ko, window);
+		(function($, ko, exports){
+			exports.app = {
+			    services: {}
+			};
+    	})(window.jQuery, window.ko, window);
     }).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app"]);
 
 services.js
