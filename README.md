@@ -5,7 +5,7 @@ A simple way to register your js objects
 
 Registrar.js
 ============
-window.registrar = {
+    window.registrar = {
     config: {
         DEBUG: true,
         
@@ -31,21 +31,21 @@ window.registrar = {
             }
         }
     }
-};
-window.r = window.registrar.register;
+    };
+    window.r = window.registrar.register;
 
 init.js
 ============
-r("init.app", function () {
+   r("init.app", function () {
     (function ($, ko, exports) {
         //set up object for the rest of the app to use; 
         exports.app = {
             services: {}
         };
     })(window.jQuery, window.ko, window);
-}).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app"]);
+   }).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app"]);
 
-r("services.app", function () {
+   r("services.app", function () {
     (function ($, ko, exports) {
         var
             services = {
@@ -62,20 +62,20 @@ r("services.app", function () {
         exports.services = services;
 
     })(window.jQuery, window.ko, window.app);
-});
+   });
 
 bindings.js
 ============
-r("bindings.app", function () {
+   r("bindings.app", function () {
     (function ($, ko, ViewModel, services) {
         var model = new ViewModel();
         ko.applyBindings(model, services.elements.bindings);
     })(window.jQuery, window.ko, app.ViewModel, app.services);
-});
+   });
 
 viewmodel.js
 ============
-r("viewmodel.app", function () {
+   r("viewmodel.app", function () {
     (function ($, ko, exports, services) {
         function ViewModel() {
             var self = this;
@@ -86,4 +86,4 @@ r("viewmodel.app", function () {
         }
         exports.ViewModel = ViewModel;
     })(window.jQuery, window.ko, window.app, window.services);
-});
+   });
