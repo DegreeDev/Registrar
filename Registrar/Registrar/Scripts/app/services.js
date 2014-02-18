@@ -1,4 +1,4 @@
-﻿r("services.app", function () {
+﻿registra.r("services.app", function () {
     (function ($, ko, exports) {
         var
             services = {

@@ -1,4 +1,4 @@
-﻿r("viewmodel.app", function () {
+﻿registra.r("viewmodel.app", function () {
     (function ($, ko, exports, services) {
         function ViewModel() {
             var self = this;

@@ -1,4 +1,4 @@
-﻿r("init.app", function () {
+﻿registra.r("init.app", function () {
     (function ($, ko, exports) {
         //set up object for the rest of the app to use; 
         exports.app = {

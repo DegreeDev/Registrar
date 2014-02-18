@@ -1,4 +1,4 @@
-﻿r("bindings.app", function () {
+﻿registra.r("bindings.app", function () {
     (function ($, ko, ViewModel, services) {
         var model = new ViewModel();
         ko.applyBindings(model, services.elements.bindings);
