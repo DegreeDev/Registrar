@@ -5,7 +5,7 @@
 
             self.id = ko.observable();
             self.name = ko.observable("testing");
-            self.description = ko.observable("description);
+            self.description = ko.observable("description");
         }
         exports.ViewModel = ViewModel;
     })(window.jQuery, window.ko, window.app, window.services);

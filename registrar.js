@@ -1,5 +1,5 @@
 ﻿var registra = (function ($, exports, document) {
-    var config = { DEBUG: false },
+    var config = { DEBUG: true },
         app = {};
 
     function log(message, level) {
