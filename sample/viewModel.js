@@ -10,3 +10,11 @@
         exports.ViewModel = ViewModel;
     })(window.jQuery, window.ko, window.app, window.services);
 });
+
+registra.r("runnow", function(){
+	console.log("ran now!!");
+}).Now();
+
+registra.r("runlater", function(){
+	console.log("ran later!!");
+});

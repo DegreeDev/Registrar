@@ -5,4 +5,4 @@
             services: {}
         };
     })(window.jQuery, window.ko, window);
-}).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app"], true);
+}).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app", "runlater"], true);
