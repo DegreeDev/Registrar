@@ -1,42 +1,81 @@
-﻿(function(){
-	window.registra = (function ($, exports, document) {
-		var config = { DEBUG: true },
-			app = {};
-		function log(message, level) {
-			if (config.DEBUG)
-				console[level](message);
-		}
-		function Register(on, callback) {
-			log("registered: " + on, "log");
-			if(app[on])
-			{
-				log(on + " has already been registered. You can only register a key once", error);
-				return;
-			}
-			app[on] = callback;
-			return {
-				OnReady: OnReady,
-				IsDebug: IsDebug, 
-				Now : function(){
-					app[on]();
-				}
-			};
-		}
-		function IsDebug() {
-			return config.DEBUG;
-		}
-		function OnReady(ons, debug) {
-			if (debug)
-				config.DEBUG = debug;
-			$(function () {
-				for (var i = 0; i < ons.length; i++) {
-					log("Actually running: " + ons[i], "log");
-					app[ons[i]]();
-					if (ons[i + 1])
-						$(document).trigger(ons[i + 1]);
-				}
-			});
-		}
-		return { r: Register };
-	})(window.jQuery, window, document);
-})();
+﻿(function (exports) {
+    if (exports.jQuery === undefined) {
+        console.error("jQuery is requird for registrar");
+        return;
+    }
+    exports.registra = (function ($, exports, document) {
+        var config = { DEBUG: true },
+			callbacks = {},
+            self = {
+                _log: function (message, override) {
+                    if (config.DEBUG || override)
+                        console.log(message);
+                },
+                _error: function (message) {
+                    console.error(message);
+                },
+                _registrationCheck: function (key, callback) {
+                    if (!callback) {
+                        self._error("You must supply a callback function.");
+                        return false;
+                    }
+                    if (!key) {
+                        self._error("You must supply a key.");
+                        return false;
+                    }
+                    if (callbacks[key]) {
+                        self._error(key + " has already been registered. You can only register a key once.");
+                        return false;
+                    }
+                    if (typeof (callback) !== 'function') {
+                        self._error(key + "'s callback is not a function.");
+                        return false;
+                    }
+                    return true;
+                },
+                _register: function (key, callback) {
+                    self._log("registered: " + key);
+                    if (!self._registrationCheck(key, callback)) return;
+                    callbacks[key] = callback;
+                    return {
+                        OnReady: self._onReady,
+                        Now: function () {
+                            callbacks[key]();
+                        },
+                        r: self.r
+                    };
+                },
+                _isDebug:function () {
+                    return config.DEBUG;
+                },
+                _onReady: function (keys) {
+                    $(function () {
+                        for (var i = 0; i < keys.length; i++) {
+                            var key = keys[i],
+                                callback = callbacks[key],
+                                nextKey = keys[i + 1] || null;
+                            self._log("Actually running: " + key);
+
+                            if (!callback) {
+                                self._error("The callback with associated with '" + key + "' was not found");
+                                return;
+                            }
+                            callback();
+
+                            if (nextKey)
+                                $(document).trigger(nextKey);
+                        }
+                    });
+                },
+                _setConfig: function (c) {
+                    config.DEBUG = c.debug;
+                }
+            };
+        $.extend(self, { r: self._register });
+        return {
+            r: self._register,
+            Configuration: self._setConfig,
+            IsDebug: self._isDebug,
+        };
+    })(exports.jQuery, exports, document);
+})(window);
