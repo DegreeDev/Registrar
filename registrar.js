@@ -4,11 +4,32 @@
         return;
     }
     exports.registra = (function ($, exports, document) {
-        var config = { DEBUG: true },
+        var config = { 
+				debug: true,
+				app: null
+			},
 			callbacks = {},
             self = {
-                _log: function (message, override) {
-                    if (config.DEBUG || override)
+				_getApp: function(key){
+					var callback = config.app ? callbacks[config.app][key] : callbacks[key];
+					if (!callback) {
+						self._error("The callback with associated with '" + key + "' was not found");
+						return;
+					}
+					return callback;
+				},
+				_runApp: function(key){
+					self._log("Actually running: " + key);
+					self._getApp(key)();
+				},
+				_setApp: function(key, callback){
+					if(config.app)
+						callbacks[config.app][key] = callback;
+					else	
+						callbacks[key] = callback;
+				},
+                _log: function (message) {
+                    if (config.debug)
                         console.log(message);
                 },
                 _error: function (message) {
@@ -36,39 +57,31 @@
                 _register: function (key, callback) {
                     self._log("registered: " + key);
                     if (!self._registrationCheck(key, callback)) return;
-                    callbacks[key] = callback;
+                    self._setApp(key, callback);
                     return {
                         OnReady: self._onReady,
                         Now: function () {
-                            callbacks[key]();
+                            self._runApp(key);
                         },
                         r: self.r
                     };
                 },
                 _isDebug:function () {
-                    return config.DEBUG;
+                    return config.debug;
                 },
                 _onReady: function (keys) {
                     $(function () {
                         for (var i = 0; i < keys.length; i++) {
                             var key = keys[i],
-                                callback = callbacks[key],
                                 nextKey = keys[i + 1] || null;
-                            self._log("Actually running: " + key);
-
-                            if (!callback) {
-                                self._error("The callback with associated with '" + key + "' was not found");
-                                return;
-                            }
-                            callback();
-
+                            self._runApp(key);
                             if (nextKey)
                                 $(document).trigger(nextKey);
                         }
                     });
                 },
                 _setConfig: function (c) {
-                    config.DEBUG = c.debug;
+                    $.extend(config, c);
                 }
             };
         $.extend(self, { r: self._register });
