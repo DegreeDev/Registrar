@@ -5,7 +5,7 @@
             services: {}
         };
     })(window.jQuery, window.ko, window);
-}).OnReady(["init.app", "services.app", "viewmodel.app", "bindings.app", "runlater", "test", "boo", "not there"]);
+}).OnReady(["missing", "init.app", "services.app", "viewmodel.app", "bindings.app", "runlater", "test", "boo", "not there"]);
 
 registra.Configuration({ debug: true });
 
