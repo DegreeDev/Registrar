@@ -45,6 +45,10 @@
 					return false;
 				}
 				if (callbacks[key]) {
+				    _error("A callback with this key has already been registered");
+				    return false;
+				}
+				if (callbacks[key]) {
 					_error(key + " has already been registered. You can only register a key once.");
 					return false;
 				}
