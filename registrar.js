@@ -87,7 +87,6 @@
 			_setConfig = function (c) {
 				$.extend(config, c);
 			};
-            
         $.extend(self, { r: _register });
         return {
             r: _register,
@@ -95,4 +94,6 @@
             IsDebug: _isDebug,
         };
     })(exports.jQuery, exports, document);
+	
+	exports.r = exports.registra.r;
 })(window);
