@@ -5,9 +5,11 @@
     }
     exports.unobtrusive = (function ($, exports, document) {
 		var config = {
-			defaultTrigger : "create.accelerator",
+			defaultTrigger : "create.app",
 			debug : false
-		};
+		},
+		keys = {};
+		
 		function _log(message, override) {
 			if (config.DEBUG || override)
 				console.log(message);
@@ -23,15 +25,18 @@
 		}
 		function _check(key, selector, callback){
 			if(!key){
-				_error("Key is required");
+				_error("key is required");
+				return false;
+			}
+			if(keys[key]){
+				_error("The key '" + key + "' is already registred");
 				return false;
 			}
 			if(!selector){
 				_error("Selector is required");
 				return false; 
 			}
-			
-			if(_checkCallback(callback))
+			if(!_checkCallback(callback))
 				return false;
 					
 			return true;
@@ -51,10 +56,16 @@
 		function _setup(key, selector, callback, trigger, precallback){
 			if(!_check(key, selector, callback))return; 
 			trigger = trigger || config.defaultTrigger;
+			if(_checkCallback(precallback)){
+				precallback();
+			}
+			keys[key] = {
+				key : key, selector : selector, callback: callback, trigger: trigger, precallback: precallback
+			};
+			_run(key, selector, callback, trigger);
 			
-			if(!(precallback && _checkCallback(precallback)))
-				return;
-			
+		}
+		function _run(key, selector, callback, trigger){
 			$(function(){
 				$(document).on(trigger, function(){
 					$(selector).each(function(index, element){
@@ -66,6 +77,8 @@
 				}).trigger(trigger);
 			});
 		}
+		
+		console.log("ran unobtrusive");
 		return {
             setup: _setup,
             Configuration: _setConfig,

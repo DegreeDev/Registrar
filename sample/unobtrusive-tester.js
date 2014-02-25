@@ -8,4 +8,10 @@
 		alert("clicked");
 	});
 
+}, "creat.tester", function(){
+	alert("hi");
+});
+
+unobtrusive.setup("all", ".apply1", function(index, element){
+
 });
