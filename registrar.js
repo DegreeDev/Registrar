@@ -19,7 +19,7 @@
 			},
 			_runApp = function(key){
 				_log("Actually running: " + key);
-				var app = _getApp(key)
+				var app = _getApp(key);
 				if(app)app();
 			},
 			_setApp = function(key, callback){
@@ -75,19 +75,14 @@
 			},
 			_onReady = function (keys) {
 				$(function () {
-					for (var i = 0; i < keys.length; i++) {
-						var key = keys[i],
-							nextKey = keys[i + 1] || null;
-						_runApp(key);
-						if (nextKey)
-							$(document).trigger(nextKey);
+					for (var i = 0, len = keys.length; i < len; i++) {
+						_runApp(keys[i]);
 					}
 				});
 			},
 			_setConfig = function (c) {
 				$.extend(config, c);
 			};
-        $.extend(self, { r: _register });
         return {
             r: _register,
             Configuration: _setConfig,
