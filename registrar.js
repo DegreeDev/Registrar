@@ -1,94 +1,95 @@
-﻿(function (exports) {
-    if (exports.jQuery === undefined) {
-        console.error("jQuery is required for registrar");
-        return;
-    }
-    exports.registra = (function ($, exports, document) {
-        var config = { 
-				debug: true,
-				app: null
-			},
-			callbacks = {},
-			_getApp = function(key){
-				var callback = config.app ? callbacks[config.app][key] : callbacks[key];
-				if (!callback) {
-					_error("The callback with associated with '" + key + "' was not found");
-					return false;
-				}
-				return callback;
-			},
-			_runApp = function(key){
-				_log("Actually running: " + key);
-				var app = _getApp(key);
-				if(app)app();
-			},
-			_setApp = function(key, callback){
-				if(config.app)
-					callbacks[config.app][key] = callback;
-				else	
-					callbacks[key] = callback;
-			},
-			_log = function (message) {
-				if (config.debug)
-					console.log(message);
-			},
-			_error = function (message) {
-				console.error(message);
-			},
-			_registrationCheck = function (key, callback) {
-				if (!callback) {
-					_error("You must supply a callback function.");
-					return false;
-				}
-				if (!key) {
-					_error("You must supply a key.");
-					return false;
-				}
-				if (callbacks[key]) {
-				    _error("A callback with this key has already been registered");
-				    return false;
-				}
-				if (callbacks[key]) {
-					_error(key + " has already been registered. You can only register a key once.");
-					return false;
-				}
-				if (typeof (callback) !== 'function') {
-					_error(key + "'s callback is not a function.");
-					return false;
-				}
-				return true;
-			},
-			_register = function (key, callback) {
-				_log("registered: " + key);
-				if (!_registrationCheck(key, callback)) return;
-				_setApp(key, callback);
-				return {
-					OnReady: _onReady,
-					Now: function () {
-						_runApp(key);
-					},
-					r: self.r
-				};
-			},
-			_isDebug = function () {
-				return config.debug;
-			},
-			_onReady = function (keys) {
-				$(function () {
-					for (var i = 0, len = keys.length; i < len; i++) {
-						_runApp(keys[i]);
-					}
-				});
-			},
-			_setConfig = function (c) {
-				$.extend(config, c);
+﻿(function(exports, document){
+	var config = { debug: false, performance: false },
+		callbacks = {},
+		callbacksRun = {},
+		_error = function (message) {
+			console.error(message);
+		},
+		_performanceStart = function (key) { 
+			if (config.debug || config.performance) console.time(key);
+		},
+		_performanceEnd = function (key) {
+			if (config.debug || config.performance) console.timeEnd(key);
+		},
+
+		_getCallback = function (key) {
+			var callback = callbacks[key];
+			if (!callback) {
+				_error("The callback with associated with '" + key + "' was not found");
+				return false;
+			}
+			return callback;
+		},
+		_runCallback = function (key) {
+			_log("Actually running: " + key);
+			var callback = _getCallback(key);
+			if (callback) callback();
+		},
+		_setCallback = function (key, callback) {
+			callbacks[key] = callback;
+		},
+		_log = function (message) {
+			if (config.debug)console.log(message);
+		},
+		_registrationCheck = function (key, callback) {
+			if (!callback) {
+				_error("You must supply a callback function.");
+				return false;
+			}
+			if (!key) {
+				_error("You must supply a key.");
+				return false;
+			}
+			if (callbacks[key]) {
+				_error("A callback with this key has already been registered");
+				return false;
+			}
+			if (callbacks[key]) {
+				_error(key + " has already been registered. You can only register a key once.");
+				return false;
+			}
+			if (typeof (callback) !== 'function') {
+				_error(key + "'s callback is not a function.");
+				return false;
+			}
+			return true;
+		},
+		_register = function (key, callback) {
+			if (!_registrationCheck(key, callback)) return;
+			_setCallback(key, callback);
+			return {
+				OnReady: _onReady,
+				Now: function () {
+					_runCallback(key);
+				},
+				r: self.r
 			};
-        return {
-            r: _register,
-            Configuration: _setConfig,
-            IsDebug: _isDebug,
-        };
-    })(exports.jQuery, exports, document);
-	
-	exports.r = exports.registra.r;
-})(window);
+			_log("registered: " + key);
+		},
+		_onReady = function (keys, debug, performance) {
+			config.debug = debug;
+			config.performance = performance;
+
+			document.addEventListener('DOMContentLoaded', function () {
+				_performanceStart("initialize");
+				for (var i = 0, len = keys.length; i < len; i++) {
+					var key = keys[i];
+					_performanceStart(key);
+					if (!callbacksRun[key]) {
+						_runCallback(key);
+						callbacksRun[key] = true;
+					} else {
+						_error("'" + key + "' was included more than once but has only been run once");
+					}
+					_performanceEnd(key);
+				}
+				_performanceEnd("initialize");
+			});
+		},
+		registrar = {
+			r: _register,
+		};
+
+	exports.r = _register;
+	exports.registra = registrar;
+})(window, document);
